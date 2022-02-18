@@ -1,0 +1,22 @@
+{
+	"env": {
+		"node": true,
+		"es2019": true,
+		"browser": false
+	},
+	"plugins": ["prettier", "security"],
+	"extends": [
+		"eslint:recommended",
+		"plugin:security/recommended",
+		"plugin:prettier/recommended" // Keep last always
+	],
+	"parserOptions": {
+		"ecmaVersion": 2020,
+		"sourceType": "module"
+	},
+	"rules": {
+		"prettier/prettier": "error",
+		"no-undef": "error",
+		"no-unused-vars": ["error", { "argsIgnorePattern": "_{0,}|opts" }]
+	}
+}

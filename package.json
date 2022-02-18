@@ -1,0 +1,54 @@
+{
+	"name": "fhir-scripts",
+	"version": "1.0.0",
+	"description": "Useful node scripts for Fhir",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"createReferralsOnFhir": "node -r dotenv/config createReferralsOnFhir.js",
+		"createPractitionersOnFhir": "node -r dotenv/config createPractitionersOnFhir.js",
+		"createConditionsOnFhir": "node -r dotenv/config createConditionsOnFhir.js",
+		"createEpisodesOfCareOnFhir": "node -r dotenv/config createEpisodesOfCareOnFhir.js",
+		"createAppointmentsOnFhir": "node -r dotenv/config createAppointmentsOnFhir.js",
+		"lint": "prettier --check . && eslint --ignore-path .gitignore .",
+		"fix": "prettier --write ."
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com/tibu-nu/fhir-scripts.git"
+	},
+	"keywords": [
+		"scripts"
+	],
+	"author": "Matteo Micheletti <matteo@tibu.nu>",
+	"license": "GNU Affero GPLv3",
+	"bugs": {
+		"url": "https://github.com/tibu-nu/fhir-scripts/issues"
+	},
+	"homepage": "https://github.com/tibu-nu/fhir-scripts#readme",
+	"dependencies": {
+		"env-cmd": "^10.1.0",
+		"node-fetch": "^3.1.0",
+		"dotenv": "^10.0.0"
+	},
+	"devDependencies": {
+		"eslint": "7.17.0",
+		"eslint-config-prettier": "7.1.0",
+		"eslint-plugin-prettier": "3.3.0",
+		"eslint-plugin-security": "1.4.0",
+		"husky": "4.3.6",
+		"lint-staged": "10.5.3",
+		"prettier": "2.2.1"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.{js,json,md,graphql}": [
+			"prettier --write"
+		]
+	}
+}
