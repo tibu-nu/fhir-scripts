@@ -8,6 +8,7 @@ const {
 	C2D_AUTH_PASSWORD,
 	C2D_AUTH_CLIENT_ID,
 	C2D_AUTH_URL,
+	DIRNAME,
 } = process.env;
 
 /**
@@ -15,17 +16,19 @@ const {
  */
 async function createReferralsOnFhir() {
 	const referrals = [];
-	fs.readdir(DIRNAME, function (err, filenames) {
+	const dirname = DIRNAME || 'Referrals';
+	fs.readdir(dirname, function (err, filenames) {
 		if (err) {
 			return;
 		}
 		filenames.forEach(function (filename) {
-			fs.readFile(`${DIRNAME}/${filename}`, 'utf-8', function (err, data) {
-				if (err) {
-					return;
-				}
-				referrals.push(JSON.parse(data));
-			});
+			filename.includes('patched') &&
+				fs.readFile(`${dirname}/${filename}`, 'utf-8', function (err, data) {
+					if (err) {
+						return;
+					}
+					referrals.push(JSON.parse(data));
+				});
 		});
 	});
 	const params = new URLSearchParams();
@@ -91,29 +94,29 @@ async function createReferralsOnFhir() {
 					console.log('\nError fetching Patient!');
 				});
 				if (patient.id) {
-					let resp = await fetch(
+					// let resp = await fetch(
+					// 	`${C2D_FHIR_BASE_URL}/ReferralRequest/${referral.id}`,
+					// 	{
+					// 		...fetchOptions,
+					// 		method: 'GET',
+					// 	},
+					// );
+					// if (resp.status === 404) {
+					console.log(`Creating/Updating ${referral.id}`);
+					resp = await fetch(
 						`${C2D_FHIR_BASE_URL}/ReferralRequest/${referral.id}`,
-						{
-							...fetchOptions,
-							method: 'GET',
-						},
+						putOptions,
 					);
-					if (resp.status === 404) {
-						console.log('\nNot Found: ', referral.id);
-						resp = await fetch(
-							`${C2D_FHIR_BASE_URL}/ReferralRequest/${referral.id}`,
-							putOptions,
-						);
-						const object = await resp.json().catch(err => {
-							console.log('\nError creating Referral!');
-						});
-						console.log('\nResponse: ', object);
-					} else {
-						const object = await resp.json().catch(err => {
-							console.log('\nError fetching Referral!');
-						});
-						console.log('\nReferral: ', object?.id || object);
-					}
+					const object = await resp.json().catch(err => {
+						console.log('\nError creating Referral!');
+					});
+					console.log('\nResponse: ', object);
+					// } else {
+					// 	const object = await resp.json().catch(err => {
+					// 		console.log('\nError fetching Referral!');
+					// 	});
+					// 	console.log('\nReferral: ', object?.id || object);
+					// }
 				}
 			}
 		} else {

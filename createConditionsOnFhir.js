@@ -16,17 +16,19 @@ const {
  */
 async function createConditionsOnFhir() {
 	const conditions = [];
-	fs.readdir(DIRNAME, function (err, filenames) {
+	const dirname = DIRNAME || 'Conditions';
+	fs.readdir(dirname, function (err, filenames) {
 		if (err) {
 			return;
 		}
 		filenames.forEach(function (filename) {
-			fs.readFile(`${DIRNAME}/${filename}`, 'utf-8', function (err, data) {
-				if (err) {
-					return;
-				}
-				conditions.push(JSON.parse(data));
-			});
+			filename.includes('patched') &&
+				fs.readFile(`${dirname}/${filename}`, 'utf-8', function (err, data) {
+					if (err) {
+						return;
+					}
+					conditions.push(JSON.parse(data));
+				});
 		});
 	});
 
@@ -110,29 +112,29 @@ async function createConditionsOnFhir() {
 							console.log('\nError fetching Practitioner!');
 						});
 						if (practitioner.id) {
-							let resp = await fetch(
+							// let resp = await fetch(
+							// 	`${C2D_FHIR_BASE_URL}/Condition/${condition.id}`,
+							// 	{
+							// 		...fetchOptions,
+							// 		method: 'GET',
+							// 	},
+							// );
+							// if (resp.status === 404) {
+							console.log('\nCreating/updating condition: ', condition.id);
+							resp = await fetch(
 								`${C2D_FHIR_BASE_URL}/Condition/${condition.id}`,
-								{
-									...fetchOptions,
-									method: 'GET',
-								},
+								putOptions,
 							);
-							if (resp.status === 404) {
-								console.log('\nNot Found: ', condition.id);
-								resp = await fetch(
-									`${C2D_FHIR_BASE_URL}/Condition/${condition.id}`,
-									putOptions,
-								);
-								const object = await resp.json().catch(err => {
-									console.log('\nError creating Condition!');
-								});
-								console.log('\nResponse: ', object);
-							} else {
-								const object = await resp.json().catch(err => {
-									console.log('\nError fetching Condition!');
-								});
-								console.log('\nCondition: ', object?.id || object);
-							}
+							const object = await resp.json().catch(err => {
+								console.log('\nError creating Condition!');
+							});
+							console.log('\nResponse: ', object);
+							// } else {
+							// 	const object = await resp.json().catch(err => {
+							// 		console.log('\nError fetching Condition!');
+							// 	});
+							// 	console.log('\nCondition: ', object?.id || object);
+							// }
 						}
 					}
 				}

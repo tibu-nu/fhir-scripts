@@ -11,6 +11,10 @@
 		"createConditionsOnFhir": "node -r dotenv/config createConditionsOnFhir.js",
 		"createEpisodesOfCareOnFhir": "node -r dotenv/config createEpisodesOfCareOnFhir.js",
 		"createAppointmentsOnFhir": "node -r dotenv/config createAppointmentsOnFhir.js",
+		"patchConditionsPatientReference": "node -r dotenv/config patchConditionsPatientReference.js",
+		"patchReferralsPatientReference": "node -r dotenv/config patchReferralsPatientReference.js",
+		"patchAppointmentsPatientReference": "node -r dotenv/config patchAppointmentsPatientReference.js",
+		"patchEpisodesPatientReference": "node -r dotenv/config patchEpisodesPatientReference.js",
 		"lint": "prettier --check . && eslint --ignore-path .gitignore .",
 		"fix": "prettier --write ."
 	},

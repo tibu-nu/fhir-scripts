@@ -14,15 +14,18 @@ const {
 /**
  * Creates an appointment on C2D following FHIR 4.0.1 standard.
  */
-async function createAppointmentOnFhir() {
+async function createAppointmentsOnFhir() {
 	const appointments = [];
-	fs.readdir(DIRNAME, function (err, filenames) {
+	const dirname = DIRNAME || 'Appointments';
+	fs.readdir(dirname, function (err, filenames) {
 		if (err) {
+			console.log({ err });
 			return;
 		}
 		filenames.forEach(function (filename) {
-			fs.readFile(`${DIRNAME}/${filename}`, 'utf-8', function (err, data) {
+			fs.readFile(`${dirname}/${filename}`, 'utf-8', function (err, data) {
 				if (err) {
+					console.log({ err });
 					return;
 				}
 				appointments.push(JSON.parse(data));
@@ -73,28 +76,18 @@ async function createAppointmentOnFhir() {
 			body: JSON.stringify(appointment),
 		};
 		if (appointment.id) {
+			console.log(
+				`Creating/Updating: ${C2D_FHIR_BASE_URL}/Appointment/${appointment.id}`,
+			);
 			let resp = await fetch(
 				`${C2D_FHIR_BASE_URL}/Appointment/${appointment.id}`,
-				{
-					...fetchOptions,
-					method: 'GET',
-				},
+				putOptions,
 			);
-			if (resp.status === 404) {
-				console.log('\nNot Found: ', appointment.id);
-				resp = await fetch(
-					`${C2D_FHIR_BASE_URL}/Appointment/${appointment.id}`,
-					putOptions,
-				);
-				const object = await resp.json().catch(err => {
-					console.log('\nError creating Appointment!');
-				});
+			const object = await resp.json().catch(err => {
+				console.log('\nError creating Appointment!');
+			});
+			if (object?.issue) {
 				console.log('\nResponse: ', object);
-			} else {
-				const object = await resp.json().catch(err => {
-					console.log('\nError fetching Appointment!');
-				});
-				console.log('\nAppointment: ', object?.id || object);
 			}
 		} else {
 			console.log('\nError: ', appointment);
@@ -102,4 +95,4 @@ async function createAppointmentOnFhir() {
 	}
 }
 
-await createAppointmentOnFhir();
+await createAppointmentsOnFhir();

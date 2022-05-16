@@ -16,12 +16,13 @@ const {
  */
 async function createPractitionersOnFhir() {
 	const practitioners = [];
-	fs.readdir(DIRNAME, function (err, filenames) {
+	const dirname = DIRNAME || 'Treaters';
+	fs.readdir(dirname, function (err, filenames) {
 		if (err) {
 			return;
 		}
 		filenames.forEach(function (filename) {
-			fs.readFile(`${DIRNAME}/${filename}`, 'utf-8', function (err, data) {
+			fs.readFile(`${dirname}/${filename}`, 'utf-8', function (err, data) {
 				if (err) {
 					return;
 				}
@@ -74,29 +75,15 @@ async function createPractitionersOnFhir() {
 		};
 
 		if (practitioner.id) {
+			console.log(`Creating/Updating ${practitioner.id}`);
 			let resp = await fetch(
 				`${C2D_FHIR_BASE_URL}/Practitioner/${practitioner.id}`,
-				{
-					...fetchOptions,
-					method: 'GET',
-				},
+				putOptions,
 			);
-			if (resp.status === 404) {
-				console.log('\nNot Found: ', practitioner.id);
-				resp = await fetch(
-					`${C2D_FHIR_BASE_URL}/Practitioner/${practitioner.id}`,
-					putOptions,
-				);
-				const object = await resp.json().catch(err => {
-					console.log('\nError creating Practitioner!');
-				});
-				console.log('\nResponse: ', object);
-			} else {
-				const object = await resp.json().catch(err => {
-					console.log('\nError creating Practitioner!');
-				});
-				console.log('\nPractitioner: ', object?.id || object);
-			}
+			const object = await resp.json().catch(err => {
+				console.log('\nError creating Practitioner!');
+			});
+			console.log('\nResponse: ', object);
 		} else {
 			console.log('\nError: ', practitioner);
 		}
